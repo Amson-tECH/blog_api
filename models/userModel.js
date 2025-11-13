@@ -20,17 +20,20 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please enter an password!"],
       unique: true,
     },
+    bio: {
+      type: String,
+      require: true,
+    },
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
+  const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
 const user = new mongoose.model("Users", userSchema);
 
-
-export default user
+export default user;
