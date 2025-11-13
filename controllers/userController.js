@@ -1,6 +1,7 @@
 import user from "../models/userModel.js";
 import validator from "validator";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 // jwt token creation
 const maxAge = 3 * 24 * 60 * 60; // three days
@@ -8,6 +9,7 @@ const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: maxAge });
 };
 
+// register user
 const registerUser = async (req, res) => {
   try {
     const { name, username, email, password, bio } = req.body;
@@ -56,7 +58,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "User created successfully",
+      message: `${newUser.username} account created successfully`,
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -68,4 +70,52 @@ const registerUser = async (req, res) => {
   }
 };
 
-export { registerUser };
+//login user
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Required fields
+    const requiredFields = { email, password };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Check if email  exists
+    const existingUser = await user.findOne({ email });
+    if (!existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found create an account",
+      });
+    }
+
+    // compare password
+    const isMatch = await bcrypt.compare(password, existingUser.password);
+    if (isMatch) {
+      const token = createToken(existingUser._id);
+      res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+      res.status(201).json({
+        success: true,
+        message: `User ${existingUser.username} signin successfully`,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Invalid password, Login with correct password",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export { registerUser, loginUser };

@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import conectDB from "./config/mongodb.js";
 import userRoute from "./routes/userRoute.js";
-import postRoute from "./routes/postRoute.js";
+// import postRoute from "./routes/postRoute.js";
 import cookieParser from "cookie-parser";
 
 // config
