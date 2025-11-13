@@ -1,5 +1,12 @@
 import user from "../models/userModel.js";
 import validator from "validator";
+import jwt from "jsonwebtoken";
+
+// jwt token creation
+const maxAge = 3 * 24 * 60 * 60; // three days
+const createToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: maxAge });
+};
 
 const registerUser = async (req, res) => {
   try {
@@ -43,7 +50,18 @@ const registerUser = async (req, res) => {
     // create user to DB
     const newUser = await user.create({ name, username, email, password, bio });
 
-    
+    // create token for user --- token to cookie
+    const token = createToken(newUser._id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
