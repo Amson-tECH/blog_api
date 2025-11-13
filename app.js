@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import conectDB from "./config/mongodb.js";
+import userRoute from "./routes/userRoute.js";
+import postRoute from "./routes/postRoute.js";
 
 // config
 dotenv.config();
@@ -15,6 +17,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "Welcome To Blog Api" });
 });
+app.use("/api/users", userRoute);
+app.use("/api/posts", postRoute);
 
 // start server
 app.listen(PORT, () => {
