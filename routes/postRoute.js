@@ -1,9 +1,11 @@
 import express from "express";
+import { createPost, getPosts, getPost, updatePost, deletePost } from "../controllers/postController.js";
+import { authUser } from "../middleware/authMiddleware.js";
 
-const postRoute = express.Router();
+const  postRoute = express.Router();
 
-// routes
-// postRoute.get("/allposts");
-// postRoute.post("/login");
+postRoute.post("/create",authUser, createPost)
+postRoute.get("/allposts", getPosts)
+
 
 export default postRoute;

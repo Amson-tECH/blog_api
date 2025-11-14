@@ -175,10 +175,10 @@ const updateProfile = async (req, res) => {
 
     if (name) userid.name = name;
     if (email) userid.email = email;
-    if (username) userid.username = username; // FIXED
+    if (username) userid.username = username; 
     if (bio !== undefined) userid.bio = bio;
 
-    await userid.save(); // You forgot this!
+    await userid.save(); 
 
     return res.json({
       success: true,
