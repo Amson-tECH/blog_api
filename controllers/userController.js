@@ -148,4 +148,56 @@ const currentUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logout, currentUser };
+// user update-profile
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Check if the logged-in user is allowed to update this profile
+    if (req.user.id !== userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized to update this profile",
+      });
+    }
+
+    // find user from the db
+    const userid = await user.findById(userId);
+    if (!userid) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // update fields
+    const { name, email, username, bio } = req.body;
+
+    if (name) userid.name = name;
+    if (email) userid.email = email;
+    if (username) userid.username = username; // FIXED
+    if (bio !== undefined) userid.bio = bio;
+
+    await userid.save(); // You forgot this!
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        id: userid.id,
+        name: userid.name,
+        username: userid.username,
+        email: userid.email,
+        bio: userid.bio,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+export { registerUser, loginUser, logout, currentUser, updateProfile };
