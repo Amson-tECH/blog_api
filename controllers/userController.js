@@ -118,11 +118,34 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 //logout user
 const logout = async (req, res) => {
-res.cookie("jwt", "", {maxAge: 1})
-res.redirect("/")
-}
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.redirect("/");
+};
 
-export { registerUser, loginUser , logout};
+// get current user
+const currentUser = async (req, res) => {
+  try {
+    const findUser = await user.findOne({ _id: req.user.id });
+    if (findUser) {
+      res.json({
+        success: true,
+        user: {
+          id: findUser.id,
+          name: findUser.name,
+          username: findUser.username,
+          email: findUser.email,
+          bio: findUser.bio,
+        },
+      });
+    } else {
+      res.status(401).json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export { registerUser, loginUser, logout, currentUser };
