@@ -5,7 +5,7 @@ import userRoute from "./routes/userRoute.js";
 import postRoute from "./routes/postRoute.js";
 import cookieParser from "cookie-parser";
 import commentRoute from "./routes/commentRoute.js";
-import cors from 'cors'
+import cors from 'cors' // to connect frontend and backend
 
 // config
 dotenv.config();
